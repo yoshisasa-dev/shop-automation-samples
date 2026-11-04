@@ -1,0 +1,6 @@
+{
+  "note": "エミュレーター専用の見本ログイン。scripts/demo-user.json にコピーして使う（demo-user.json は .gitignore で公開しない）",
+  "email": "demo-staff@example.com",
+  "password": "demo-password-1",
+  "displayName": "店長 小鳥遊 ひかり"
+}

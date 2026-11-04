@@ -1,0 +1,16 @@
+{%- comment -%}
+  注文確認メール（設定 → 通知 → 注文の確認 → コードを編集）に足した部分。
+  「<p>{{ email_body }}</p>」のすぐ下に入れる。
+  受け取り日・受け取り時間は、カートの画面（snippets/pickup-datetime.liquid）で選んだカート属性。
+  メッセージプレート・ろうそくは商品ごとの入力（line item properties）で、元のテンプレートがそのまま表示する。
+{%- endcomment -%}
+            {%- comment -%} パティスリーこむぎ：カートで選んだ受け取り日時 {%- endcomment -%}
+            {% if attributes['受け取り日'] != blank %}
+            <table style="width:100%;margin:16px 0;border-collapse:collapse;background:#fbf3ec;border-radius:8px;">
+              <tr><td style="padding:16px;">
+                <p style="margin:0 0 6px;font-weight:bold;">お受け取り日時</p>
+                <p style="margin:0;font-size:18px;">{{ attributes['受け取り日'] | date: '%Y年%-m月%-d日' }}　{{ attributes['受け取り時間'] }}</p>
+                <p style="margin:6px 0 0;font-size:13px;color:#777777;">当日は店頭でお名前をお伝えください。</p>
+              </td></tr>
+            </table>
+            {% endif %}

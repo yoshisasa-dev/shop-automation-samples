@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 店の人 = ログインしていて、members/{自分のuid} がある人
+    function isMember() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+
+    // members は本人が読めるだけ。追加・変更は管理コンソールか管理用スクリプトから
+    match /members/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /{collection}/{id} {
+      allow read, write: if collection != 'members' && isMember();
+    }
+  }
+}

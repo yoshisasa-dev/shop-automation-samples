@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  :root { --main: #7a5c99; --ink: #2d2a32; --sub: #6e6878; --line: #e2dcea; --ng: #c0503a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #faf8fc; color: var(--ink); font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+  header { background: var(--main); color: #fff; padding: 16px 18px; font-weight: 700; font-size: 18px; }
+  main { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; line-height: 1.8; font-size: 15px; }
+  .note { color: var(--sub); font-size: 13px; margin-top: 10px; }
+  button { width: 100%; margin-top: 18px; font-size: 17px; font-weight: 700; padding: 14px; border: none; border-radius: 12px; background: var(--ng); color: #fff; }
+  button:disabled { background: #e0c3bd; }
+  .message { margin-top: 16px; font-size: 15px; font-weight: 700; }
+  .message.error { color: var(--ng); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div id="data" data-json="<?= data ?>" data-token="<?= token ?>"></div>
+  <header><?= shopName ?>　ご予約のキャンセル</header>
+  <main>
+    <div class="card hidden" id="card"></div>
+    <p class="note hidden" id="deadline"></p>
+    <button class="hidden" id="cancel">このご予約をキャンセルする</button>
+    <div class="message" id="message"></div>
+  </main>
+<script>
+  var holder = document.getElementById('data');
+  var info = JSON.parse(holder.getAttribute('data-json'));
+  var token = holder.getAttribute('data-token');
+  function $(id) { return document.getElementById(id); }
+  function showMessage(text, isError) {
+    $('message').textContent = text || '';
+    $('message').className = 'message' + (isError ? ' error' : '');
+  }
+  if (!info.found) {
+    showMessage(info.message, true);
+  } else {
+    $('card').textContent = info.name + '\n' + info.date + ' ' + info.start + '〜' + info.end + '\n' + info.menu;
+    $('card').style.whiteSpace = 'pre-line';
+    $('card').classList.remove('hidden');
+    $('deadline').textContent = 'キャンセルの受付は ' + info.deadline + ' までです。';
+    $('deadline').classList.remove('hidden');
+    if (info.canCancel) {
+      $('cancel').classList.remove('hidden');
+    } else {
+      showMessage(info.message, true);
+    }
+  }
+  $('cancel').addEventListener('click', function () {
+    $('cancel').disabled = true;
+    showMessage('キャンセルしています…', false);
+    google.script.run.withSuccessHandler(function (res) {
+      if (res.ok) {
+        $('cancel').classList.add('hidden');
+        showMessage(res.message, false);
+      } else {
+        $('cancel').disabled = false;
+        showMessage(res.message, true);
+      }
+    }).withFailureHandler(function () {
+      $('cancel').disabled = false;
+      showMessage('通信がうまくいきませんでした。もう一度お試しください。', true);
+    }).apiCancel(token);
+  });
+</script>
+</body>
+</html>

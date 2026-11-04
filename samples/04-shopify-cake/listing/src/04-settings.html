@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>04 あとから変えられる</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  h1 { font-size: 60px; margin-top: 26px; }
+  .panel { position: absolute; left: 80px; top: 420px; width: 560px; background: #fff; border-radius: 22px; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(90, 50, 40, 0.15); padding: 30px 32px; }
+  .panel h2 { font-size: 28px; font-weight: 800; margin-bottom: 18px; }
+  .row { border-top: 1px solid var(--line); padding: 16px 0; }
+  .row label { display: block; font-size: 20px; color: var(--sub); margin-bottom: 8px; }
+  .row .v { border: 1px solid #cfc3bc; border-radius: 10px; padding: 10px 14px; font-size: 24px; font-weight: 700; }
+  .list { position: absolute; left: 690px; top: 430px; width: 450px; }
+  .list h3 { font-size: 30px; font-weight: 800; margin-bottom: 16px; }
+  .list li { list-style: none; font-size: 27px; font-weight: 700; line-height: 1.4; padding: 12px 0 12px 46px; position: relative; }
+  .list li::before { content: "✓"; position: absolute; left: 0; top: 10px; color: var(--accent); font-size: 32px; font-weight: 800; }
+  .list .sub { font-size: 21px; color: var(--sub); font-weight: 500; line-height: 1.6; margin-top: 22px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <span class="chip">運営がラク</span>
+    <h1>お店の決まりは、<br><em>管理画面から</em>変えられます</h1>
+  </div>
+  <div class="panel">
+    <h2>受け取り日時の設定</h2>
+    <div class="row"><label>何日後から予約できるか</label><div class="v">3 日後から</div></div>
+    <div class="row"><label>何日先まで予約できるか</label><div class="v">30 日先まで</div></div>
+    <div class="row"><label>定休日（選べない曜日）</label><div class="v">火</div></div>
+    <div class="row"><label>受け取り時間</label><div class="v">11:00, 12:00, 13:00 … 18:00</div></div>
+  </div>
+  <div class="list">
+    <h3>ほかにも自分で</h3>
+    <ul>
+      <li>商品・値段・写真の追加</li>
+      <li>サイズや味の選択肢</li>
+      <li>お知らせバーの文章</li>
+      <li>クリスマスなど季節の商品</li>
+    </ul>
+    <p class="sub">コードを触らずに、Shopifyの管理画面で変えられます。使い方は 設置手順書.md にまとめています。</p>
+  </div>
+  <p class="note">※画面は架空のサンプル店「パティスリー こむぎ」の設定を元にした画面イメージです</p>
+</body>
+</html>

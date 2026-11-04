@@ -1,0 +1,34 @@
+# 依存パッケージ・ビルドの出力
+node_modules/
+dist/
+
+# 環境ごとの設定（本物の鍵が入るもの）
+.env
+.env.*
+!.env.example
+# 06-salon-admin のエミュレーター専用の設定（練習用の値だけ。テストと画面の確認に必要）
+!.env.emulator
+!.env.test
+
+# ログ・OS のファイル
+*.log
+.DS_Store
+
+# 個人の設定・ログイン情報
+.clasp.json
+# （/ を含まない書き方にして、どの深さのフォルダにあっても除外する）
+demo-user.json
+
+# Firebase・Python の一時ファイル
+.firebase/
+__pycache__/
+*.pyc
+
+# エディタ・テストの出力
+.vscode/
+.idea/
+coverage/
+
+# 作業用のフォルダ（エディタ・Shopify CLI の作業ファイル）
+.claude/
+.shopify/

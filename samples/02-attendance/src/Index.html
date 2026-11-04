@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  :root {
+    --green: #2f7d5b;
+    --green-soft: #e8f3ec;
+    --ink: #2b2b2b;
+    --sub: #6b6b6b;
+    --line: #dfe7e2;
+    --in: #2f7d5b;
+    --break: #e09a1a;
+    --back: #2f6fb5;
+    --out: #c0503a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f8f6;
+    color: var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  }
+  header {
+    background: var(--green);
+    color: #fff;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 17px;
+  }
+  main { max-width: 480px; margin: 0 auto; padding: 18px 16px 32px; }
+  .clock { text-align: center; margin: 6px 0 18px; }
+  .clock .date { color: var(--sub); font-size: 15px; }
+  .clock .time { font-size: 52px; font-weight: 700; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  label { display: block; font-size: 14px; color: var(--sub); margin: 0 0 6px; }
+  .names { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .names button {
+    font-size: 17px;
+    padding: 12px 8px;
+    border: 1px solid #cfd8d3;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .names button.selected { background: var(--green-soft); border: 2px solid var(--green); font-weight: 700; }
+  input {
+    width: 100%;
+    font-size: 20px;
+    padding: 12px;
+    border: 1px solid #cfd8d3;
+    border-radius: 10px;
+    background: #fff;
+    margin-bottom: 14px;
+  }
+  input { letter-spacing: 0.4em; }
+  .primary {
+    width: 100%;
+    font-size: 19px;
+    font-weight: 700;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--green);
+    color: #fff;
+  }
+  .who { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .last { color: var(--sub); font-size: 15px; margin-bottom: 16px; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .buttons button {
+    height: 104px;
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .buttons button[data-type="出勤"] { background: var(--in); }
+  .buttons button[data-type="休憩"] { background: var(--break); }
+  .buttons button[data-type="戻り"] { background: var(--back); }
+  .buttons button[data-type="退勤"] { background: var(--out); }
+  .buttons button:disabled { background: #e6e6e6; color: #b3b3b3; }
+  .switch {
+    margin-top: 16px;
+    width: 100%;
+    background: none;
+    border: 1px solid #cfd8d3;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 15px;
+    color: var(--sub);
+  }
+  .message { min-height: 28px; margin: 16px 2px 0; font-size: 16px; font-weight: 700; color: var(--green); }
+  .message.error { color: var(--out); }
+  .hidden { display: none; }
+  footer { text-align: center; color: var(--sub); font-size: 12px; margin-top: 24px; }
+</style>
+</head>
+<body>
+  <header><?= shopName ?>　打刻</header>
+  <main>
+    <div class="clock">
+      <div class="date" id="date"></div>
+      <div class="time" id="time"></div>
+    </div>
+
+    <div class="card" id="login">
+      <label>名前をえらんでください</label>
+      <div class="names" id="names">
+        <? staff.forEach(function (s) { ?>
+        <button type="button" data-id="<?= s.id ?>"><?= s.name ?></button>
+        <? }); ?>
+      </div>
+      <label for="pin">暗証番号（4けた）</label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]*">
+      <button class="primary" id="next">つぎへ</button>
+    </div>
+
+    <div class="card hidden" id="punch">
+      <div class="who" id="who"></div>
+      <div class="last" id="last"></div>
+      <div class="buttons">
+        <button data-type="出勤">出勤</button>
+        <button data-type="休憩">休憩</button>
+        <button data-type="戻り">戻り</button>
+        <button data-type="退勤">退勤</button>
+      </div>
+      <button class="switch" id="switch">ほかの人に切り替える</button>
+    </div>
+
+    <div class="message" id="message"></div>
+    <footer>記録される時刻は、お店のシステムの時計です。<br>※架空のサンプル店の見本です</footer>
+  </main>
+
+<script>
+  var WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+  var current = { staffId: '', pin: '' };
+  var selectedId = '';
+  var nameButtons = Array.prototype.slice.call(document.querySelectorAll('#names button'));
+  var idleTimer = null;
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.buttons button'));
+
+  function $(id) { return document.getElementById(id); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function tick() {
+    var d = new Date();
+    $('date').textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日（' + WEEK[d.getDay()] + '）';
+    $('time').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  function showMessage(text, isError) {
+    $('message').textContent = text || '';
+    $('message').className = 'message' + (isError ? ' error' : '');
+  }
+
+  function setBusy(busy) {
+    $('next').disabled = busy;
+    buttons.forEach(function (b) { if (busy) b.disabled = true; });
+  }
+
+  function selectName(id) {
+    selectedId = id;
+    nameButtons.forEach(function (b) { b.classList.toggle('selected', b.getAttribute('data-id') === id); });
+  }
+
+  nameButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      selectName(b.getAttribute('data-id'));
+      $('pin').focus();
+    });
+  });
+
+  function backToLogin() {
+    current = { staffId: '', pin: '' };
+    $('pin').value = '';
+    selectName('');
+    $('punch').classList.add('hidden');
+    $('login').classList.remove('hidden');
+  }
+
+  // みんなで1台を使うときのため、しばらく触らなければ最初の画面に戻す
+  function restartIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () { backToLogin(); showMessage(''); }, 60000);
+  }
+
+  function render(res) {
+    setBusy(false);
+    if (!res || !res.ok) {
+      showMessage(res ? res.message : 'うまく記録できませんでした。', true);
+      restoreButtons();
+      return;
+    }
+    render.lastOk = res;
+    $('login').classList.add('hidden');
+    $('punch').classList.remove('hidden');
+    $('who').textContent = res.name + ' さん';
+    $('last').textContent = res.last
+      ? '最後の打刻：' + res.last.type + '（' + Number(res.last.at.slice(5, 7)) + '/' + Number(res.last.at.slice(8, 10)) + ' ' + res.last.at.slice(11) + '）'
+      : 'まだ打刻はありません';
+    buttons.forEach(function (b) { b.disabled = res.next.indexOf(b.getAttribute('data-type')) === -1; });
+    showMessage(res.message, false);
+    restartIdleTimer();
+  }
+
+  // エラーのあとは、最後にうまくいったときの押せるボタンに戻す
+  function restoreButtons() {
+    if (render.lastOk && !$('punch').classList.contains('hidden')) {
+      buttons.forEach(function (b) { b.disabled = render.lastOk.next.indexOf(b.getAttribute('data-type')) === -1; });
+    }
+  }
+
+  function fail() {
+    setBusy(false);
+    showMessage('通信がうまくいきませんでした。電波のよいところでもう一度押してください。', true);
+    restoreButtons();
+  }
+
+  $('next').addEventListener('click', function () {
+    var staffId = selectedId;
+    var pin = $('pin').value;
+    if (!staffId) return showMessage('名前をえらんでください。', true);
+    if (!/^\d{4}$/.test(pin)) return showMessage('暗証番号は4けたの数字です。', true);
+    current = { staffId: staffId, pin: pin };
+    render.lastOk = null;
+    setBusy(true);
+    showMessage('確認しています…', false);
+    google.script.run.withSuccessHandler(render).withFailureHandler(fail).apiStatus(staffId, pin);
+  });
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var type = b.getAttribute('data-type');
+      setBusy(true);
+      showMessage(type + 'を記録しています…', false);
+      google.script.run.withSuccessHandler(render).withFailureHandler(fail).apiPunch(current.staffId, current.pin, type);
+    });
+  });
+
+  $('switch').addEventListener('click', function () {
+    backToLogin();
+    showMessage('');
+  });
+</script>
+</body>
+</html>

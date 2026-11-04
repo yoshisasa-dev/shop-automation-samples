@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  :root { --main: #7a5c99; --soft: #f1ebf7; --ink: #2d2a32; --sub: #6e6878; --line: #e2dcea; --ng: #c0503a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #faf8fc; color: var(--ink); font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+  header { background: var(--main); color: #fff; padding: 16px 18px; }
+  header .name { font-weight: 700; font-size: 18px; }
+  header .info { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+  main { max-width: 520px; margin: 0 auto; padding: 16px 16px 40px; }
+  h2 { font-size: 16px; margin: 22px 0 10px; display: flex; align-items: center; gap: 8px; }
+  h2 .num { width: 26px; height: 26px; border-radius: 50%; background: var(--main); color: #fff; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+  .menu { width: 100%; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; color: var(--ink); }
+  .menu .title { font-weight: 700; font-size: 16px; }
+  .menu .meta { color: var(--main); font-weight: 700; font-size: 14px; margin-top: 4px; }
+  .menu .desc { color: var(--sub); font-size: 13px; margin-top: 4px; }
+  .selected { border: 2px solid var(--main) !important; background: var(--soft) !important; }
+  .dates { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+  .date { flex: none; width: 74px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 4px; font-size: 13px; color: var(--ink); }
+  .date:disabled { background: #f0f0f0; color: #b0b0b0; }
+  .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .slot { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 0; font-size: 15px; font-weight: 700; color: var(--main); }
+  .empty { color: var(--sub); font-size: 14px; }
+  label { display: block; font-size: 13px; color: var(--sub); margin: 10px 0 4px; }
+  input, textarea { width: 100%; font-size: 16px; padding: 11px; border: 1px solid #d5cde0; border-radius: 10px; background: #fff; font-family: inherit; }
+  textarea { height: 80px; }
+  .primary { width: 100%; margin-top: 16px; font-size: 17px; font-weight: 700; padding: 14px; border: none; border-radius: 12px; background: var(--main); color: #fff; }
+  .primary:disabled { background: #c9bfd6; }
+  .summary { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.7; }
+  .message { margin-top: 14px; font-size: 15px; font-weight: 700; white-space: pre-line; }
+  .message.error { color: var(--ng); }
+  .done { background: #fff; border: 2px solid var(--main); border-radius: 16px; padding: 20px; text-align: center; }
+  .done .big { font-size: 20px; font-weight: 700; color: var(--main); margin-bottom: 10px; }
+  .hidden { display: none; }
+  footer { text-align: center; color: var(--sub); font-size: 12px; margin-top: 28px; }
+</style>
+</head>
+<body>
+  <div id="data" data-json="<?= data ?>"></div>
+  <header>
+    <div class="name"><?= shopName ?>　ご予約</div>
+    <div class="info" id="info"></div>
+  </header>
+  <main>
+    <div id="form">
+      <h2><span class="num">1</span>メニュー</h2>
+      <div id="menus"></div>
+
+      <div id="step2" class="hidden">
+        <h2><span class="num">2</span>日にち</h2>
+        <div class="dates" id="dates"></div>
+      </div>
+
+      <div id="step3" class="hidden">
+        <h2><span class="num">3</span>時間</h2>
+        <div class="slots" id="slots"></div>
+        <div class="empty" id="slotsMessage"></div>
+      </div>
+
+      <div id="step4" class="hidden">
+        <h2><span class="num">4</span>お客さま情報</h2>
+        <div class="summary" id="summary"></div>
+        <label for="name">お名前</label>
+        <input id="name" autocomplete="name" maxlength="40">
+        <label for="phone">電話番号</label>
+        <input id="phone" type="tel" autocomplete="tel" maxlength="20">
+        <label for="email">メールアドレス（確認メールが届きます）</label>
+        <input id="email" type="email" autocomplete="email" maxlength="100">
+        <label for="note">ご要望（任意）</label>
+        <textarea id="note" maxlength="300"></textarea>
+        <button class="primary" id="book">この内容で予約する</button>
+      </div>
+      <div class="message" id="message"></div>
+    </div>
+
+    <div id="done" class="done hidden">
+      <div class="big">ご予約ありがとうございます</div>
+      <div class="summary" id="doneSummary"></div>
+      <div class="message" id="doneMessage"></div>
+    </div>
+    <footer>※架空のサンプル店の見本です。実際の予約は発生しません。</footer>
+  </main>
+
+<script>
+  var DATA = JSON.parse(document.getElementById('data').getAttribute('data-json'));
+  var state = { menu: null, date: null, time: null };
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function yen(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function showMessage(text, isError) {
+    $('message').textContent = text || '';
+    $('message').className = 'message' + (isError ? ' error' : '');
+  }
+  function select(container, button) {
+    Array.prototype.forEach.call(container.children, function (c) { c.classList.remove('selected'); });
+    button.classList.add('selected');
+  }
+
+  $('info').textContent = '受付 ' + DATA.hours + (DATA.closedDays ? '　定休日 ' + DATA.closedDays + '曜日' : '');
+
+  DATA.menus.forEach(function (m) {
+    var b = el('button', 'menu');
+    b.appendChild(el('div', 'title', m.name));
+    b.appendChild(el('div', 'meta', m.minutes + '分　' + yen(m.price) + '円'));
+    if (m.description) b.appendChild(el('div', 'desc', m.description));
+    b.addEventListener('click', function () {
+      state.menu = m;
+      state.time = null;
+      select($('menus'), b);
+      $('step2').classList.remove('hidden');
+      $('step4').classList.add('hidden');
+      if (state.date) loadSlots();
+    });
+    $('menus').appendChild(b);
+  });
+
+  DATA.dates.forEach(function (d) {
+    var b = el('button', 'date');
+    b.appendChild(el('div', '', d.label.replace(/（/, '\n（')));
+    b.style.whiteSpace = 'pre-line';
+    if (d.closed) { b.disabled = true; b.appendChild(el('div', '', '定休日')); }
+    b.addEventListener('click', function () {
+      state.date = d;
+      state.time = null;
+      select($('dates'), b);
+      $('step4').classList.add('hidden');
+      loadSlots();
+    });
+    $('dates').appendChild(b);
+  });
+
+  function loadSlots() {
+    $('step3').classList.remove('hidden');
+    $('slots').textContent = '';
+    $('slotsMessage').textContent = '空いている時間を調べています…';
+    showMessage('');
+    var asked = state.menu.name + '|' + state.date.date;
+    google.script.run.withSuccessHandler(function (res) {
+      if (asked !== state.menu.name + '|' + state.date.date) return;
+      if (!res.ok) { $('slotsMessage').textContent = ''; return showMessage(res.message, true); }
+      $('slotsMessage').textContent = res.slots.length ? '' : 'この日は空きがありません。ほかの日をお選びください。';
+      res.slots.forEach(function (t) {
+        var b = el('button', 'slot', t);
+        b.addEventListener('click', function () {
+          state.time = t;
+          select($('slots'), b);
+          $('summary').textContent = state.date.label + ' ' + t + '〜　' + state.menu.name + '（' + state.menu.minutes + '分・' + yen(state.menu.price) + '円）';
+          $('step4').classList.remove('hidden');
+          $('name').focus();
+        });
+        $('slots').appendChild(b);
+      });
+    }).withFailureHandler(fail).apiSlots(state.menu.name, state.date.date);
+  }
+
+  function fail() {
+    $('book').disabled = false;
+    showMessage('通信がうまくいきませんでした。もう一度お試しください。', true);
+  }
+
+  $('book').addEventListener('click', function () {
+    if (!state.menu || !state.date || !state.time) return showMessage('メニュー・日にち・時間を選んでください。', true);
+    $('book').disabled = true;
+    showMessage('予約しています…', false);
+    google.script.run.withSuccessHandler(function (res) {
+      $('book').disabled = false;
+      if (!res.ok) {
+        showMessage(res.message, true);
+        if (/うまってしまいました/.test(res.message)) loadSlots();
+        return;
+      }
+      $('form').classList.add('hidden');
+      $('done').classList.remove('hidden');
+      $('doneSummary').textContent = '予約番号 ' + res.bookingNo + '\n' + res.date + ' ' + res.start + '〜' + res.end + '\n' + res.menu;
+      $('doneSummary').style.whiteSpace = 'pre-line';
+      $('doneMessage').textContent = res.message;
+      window.scrollTo(0, 0);
+    }).withFailureHandler(fail).apiBook({
+      menu: state.menu.name, date: state.date.date, time: state.time,
+      name: $('name').value, phone: $('phone').value, email: $('email').value, note: $('note').value
+    });
+  });
+</script>
+</body>
+</html>

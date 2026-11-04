@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>03 流れ</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  h1 { font-size: 60px; margin-top: 26px; }
+  .col { position: absolute; top: 420px; width: 330px; }
+  .c1 { left: 80px; } .c2 { left: 445px; } .c3 { left: 810px; }
+  .head { display: flex; align-items: center; gap: 12px; font-size: 27px; font-weight: 800; line-height: 1.3; margin-bottom: 14px; height: 70px; }
+  .num { flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .box { width: 330px; height: 500px; }
+  .cap { font-size: 22px; line-height: 1.5; color: var(--sub); font-weight: 500; margin-top: 14px; }
+  /* 画面イメージ（カートの受け取り日時・確認メール） */
+  .mock { background: #fff; border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(90, 50, 40, 0.15); padding: 26px 24px; font-size: 20px; }
+  .mock .t { font-weight: 800; font-size: 22px; margin-bottom: 14px; }
+  .mock label { display: block; font-size: 17px; color: var(--sub); margin: 14px 0 6px; }
+  .mock .field { border: 1px solid #cfc3bc; border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; }
+  .mock .field span { color: #9a8a82; }
+  .mock .hint { font-size: 15px; color: var(--sub); margin-top: 10px; line-height: 1.5; }
+  .mock .btn { margin-top: 22px; background: #000; color: #fff; border-radius: 10px; padding: 14px; text-align: center; font-weight: 700; }
+  .mail .greet { font-weight: 800; font-size: 22px; margin-bottom: 12px; }
+  .mail .pickup { background: #fbf3ec; border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .mail .pickup b { display: block; font-size: 17px; margin-bottom: 4px; }
+  .mail .pickup big { font-size: 22px; font-weight: 700; }
+  .mail .item { border-top: 1px solid var(--line); padding-top: 14px; font-size: 18px; line-height: 1.6; }
+  .mail .item small { color: var(--sub); font-size: 16px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <span class="chip">しくみ</span>
+    <h1>選んで、日時を決めて、<br><em>お店で受け取るだけ</em></h1>
+  </div>
+  <div class="col c1">
+    <div class="head"><span class="num">1</span>ケーキとサイズ、<br>プレートの文字</div>
+    <div class="shot box" style="--w:400px; --s:0.86; --x:8px; --y:570px">
+      <img src="../../screens/shots/product.jpg" alt="">
+    </div>
+    <p class="cap">サイズを選ぶと値段が変わります</p>
+  </div>
+  <div class="col c2">
+    <div class="head"><span class="num">2</span>受け取り日と<br>時間を選ぶ</div>
+    <div class="mock box">
+      <div class="t">受け取り日時</div>
+      <label>受け取り日</label>
+      <div class="field">2026/11/14（土）<span>▼</span></div>
+      <label>受け取り時間</label>
+      <div class="field">14:00<span>▼</span></div>
+      <p class="hint">3日後から30日後まで選べます。<br>火曜日は定休日のため選べません。</p>
+      <div class="btn">ご購入手続きへ</div>
+    </div>
+    <p class="cap">定休日や近すぎる日は選べません</p>
+  </div>
+  <div class="col c3">
+    <div class="head"><span class="num">3</span>確認メールが<br>自動で届く</div>
+    <div class="mock mail box">
+      <div class="greet">ご注文頂きありがとうございました。</div>
+      <div class="pickup">
+        <b>お受け取り日時</b>
+        <big>2026年11月14日　14:00</big>
+      </div>
+      <div class="item">
+        いちごのショートケーキ<br>
+        <small>5号<br>メッセージプレート：はるとくん 5さい おめでとう<br>ろうそく：小5本</small>
+      </div>
+    </div>
+    <p class="cap">お店の注文一覧にも残ります</p>
+  </div>
+  <p class="note">※画面は架空のサンプル店「パティスリー こむぎ」で作ったものです（2・3は画面イメージ）</p>
+</body>
+</html>

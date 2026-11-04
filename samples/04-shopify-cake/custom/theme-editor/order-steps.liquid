@@ -1,0 +1,23 @@
+{%- comment -%}
+  トップページ「ご予約の流れ」（カスタムLiquid セクション）に貼る中身
+  テーマエディタ →「セクションを追加」→「カスタムLiquid」→「Liquid コード」欄に、この下をそのまま貼る
+{%- endcomment -%}
+<div class="komugi-steps">
+  <h2>ご予約の流れ</h2>
+  <ol>
+    <li><b>1</b><span>ケーキとサイズを選ぶ</span><small>メッセージプレートやろうそくも、ここで入れられます。</small></li>
+    <li><b>2</b><span>受け取り日と時間を選ぶ</span><small>カートの画面で選びます。3日後から30日後まで、火曜はお休みです。</small></li>
+    <li><b>3</b><span>お店で受け取る</span><small>受け取りの時間に、お名前をお伝えください。</small></li>
+  </ol>
+  <p><a href="/pages/guide">くわしくは「ご利用ガイド」へ</a></p>
+</div>
+<style>
+.komugi-steps{text-align:center;color:#4a2f25}
+.komugi-steps h2{margin:0 0 24px}
+.komugi-steps ol{list-style:none;padding:0;margin:0 auto;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));max-width:960px}
+.komugi-steps li{background:#fff;border-radius:12px;padding:20px 16px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.komugi-steps b{width:36px;height:36px;border-radius:50%;background:#e8434f;color:#fff;display:grid;place-items:center}
+.komugi-steps span{font-weight:bold}
+.komugi-steps small{font-size:.85rem;line-height:1.6}
+.komugi-steps p{margin:20px 0 0}
+</style>

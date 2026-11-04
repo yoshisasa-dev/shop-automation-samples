@@ -1,0 +1,125 @@
+{%- comment -%}
+  受け取り日・時間の入力（カートのページと、カートの引き出しの両方で使う）
+  入力はカートの「属性（attributes）」として注文に残り、お店の注文画面と確認メールに出る
+  @param {string} section_id - 同じページに2つ出てもIDが重ならないようにするため
+{%- endcomment -%}
+{%- if settings.pickup_enabled and cart != empty -%}
+  {%- liquid
+    assign uid = 'Pickup-' | append: section_id
+    assign saved_date = cart.attributes['受け取り日']
+    assign saved_time = cart.attributes['受け取り時間']
+    assign slots = settings.pickup_time_slots | split: ','
+  -%}
+  <pickup-datetime
+    class="pickup"
+    data-lead-days="{{ settings.pickup_lead_days }}"
+    data-max-days="{{ settings.pickup_max_days }}"
+    data-closed="{{ settings.pickup_closed_days | escape }}"
+  >
+    <p class="pickup__heading cart-primary-typography">受け取り日時</p>
+    {%- if settings.pickup_note != blank -%}
+      <p class="pickup__note">{{ settings.pickup_note | escape }}</p>
+    {%- endif -%}
+    <div class="pickup__fields">
+      <label class="pickup__label" for="{{ uid }}-date">
+        受け取り日
+        <input
+          type="date"
+          id="{{ uid }}-date"
+          class="pickup__input field__input"
+          name="attributes[受け取り日]"
+          value="{{ saved_date | escape }}"
+          form="cart-form"
+          required
+          data-pickup-date
+        >
+      </label>
+      <label class="pickup__label" for="{{ uid }}-time">
+        受け取り時間
+        <select
+          id="{{ uid }}-time"
+          class="pickup__input field__input"
+          name="attributes[受け取り時間]"
+          form="cart-form"
+          required
+          data-pickup-time
+        >
+          <option value="">選んでください</option>
+          {%- for slot in slots -%}
+            {%- assign s = slot | strip -%}
+            {%- if s != blank -%}
+              <option value="{{ s | escape }}"{% if s == saved_time %} selected{% endif %}>{{ s | escape }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </label>
+    </div>
+    <p class="pickup__error" role="alert" data-pickup-error hidden></p>
+  </pickup-datetime>
+
+  <style>
+    .pickup { display: block; margin-block-end: var(--margin-md, 16px); padding: 14px 16px; border: 1px solid rgb(var(--color-foreground-rgb) / 0.15); border-radius: 10px; }
+    .pickup__heading { margin: 0 0 4px; font-weight: 700; }
+    .pickup__note { margin: 0 0 10px; font-size: 0.85em; opacity: 0.75; }
+    .pickup__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pickup__label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85em; }
+    .pickup__input { width: 100%; min-height: 44px; padding: 8px 10px; font-size: 16px; }
+    .pickup__error { margin: 8px 0 0; color: #b3261e; font-size: 0.85em; font-weight: 700; }
+  </style>
+
+  <script>
+    if (!customElements.get('pickup-datetime')) {
+      customElements.define('pickup-datetime', class extends HTMLElement {
+        connectedCallback() {
+          this.dateInput = this.querySelector('[data-pickup-date]');
+          this.timeInput = this.querySelector('[data-pickup-time]');
+          this.error = this.querySelector('[data-pickup-error]');
+          const lead = Number(this.dataset.leadDays || 0);
+          const max = Number(this.dataset.maxDays || 30);
+          this.closed = String(this.dataset.closed || '').split(/[,、，\s]+/).filter(Boolean);
+          this.dateInput.min = this.ymd(this.addDays(new Date(), lead));
+          this.dateInput.max = this.ymd(this.addDays(new Date(), max));
+          this.dateInput.addEventListener('change', () => this.save());
+          this.timeInput.addEventListener('change', () => this.save());
+          // 前に選んだ日が、もう選べない日になっていないか
+          if (this.dateInput.value) this.check();
+        }
+
+        addDays(d, n) { const c = new Date(d.getFullYear(), d.getMonth(), d.getDate()); c.setDate(c.getDate() + n); return c; }
+        ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+        /** 選べない日なら、注文に進めないようにして理由を出す */
+        check() {
+          const v = this.dateInput.value;
+          let message = '';
+          if (v) {
+            const p = v.split('-').map(Number);
+            const weekday = '日月火水木金土'.charAt(new Date(p[0], p[1] - 1, p[2]).getDay());
+            if (v < this.dateInput.min) message = this.dateInput.min.replace(/-/g, '/') + ' 以降の日を選んでください。';
+            else if (v > this.dateInput.max) message = this.dateInput.max.replace(/-/g, '/') + ' までの日を選んでください。';
+            else if (this.closed.includes(weekday)) message = weekday + '曜日は定休日のため、お受け取りできません。';
+          }
+          this.dateInput.setCustomValidity(message);
+          this.error.textContent = message;
+          this.error.hidden = !message;
+          return !message;
+        }
+
+        /** 選んだ日時をカートに保存しておく（引き出しを閉じても消えないように） */
+        save() {
+          const ok = this.check();
+          const attributes = {
+            '受け取り日': ok ? this.dateInput.value : '',
+            '受け取り時間': this.timeInput.value
+          };
+          const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+          fetch(root + 'cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ attributes })
+          }).catch(() => {});
+        }
+      });
+    }
+  </script>
+{%- endif -%}

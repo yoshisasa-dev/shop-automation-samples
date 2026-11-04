@@ -1,0 +1,53 @@
+{
+  "name": "受け取り日時",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "カートで、ケーキの受け取り日と時間を選んでもらいます。選んだ日時は注文に「受け取り日」「受け取り時間」として残ります。"
+    },
+    {
+      "type": "checkbox",
+      "id": "pickup_enabled",
+      "label": "カートで受け取り日時を選んでもらう",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "pickup_lead_days",
+      "label": "何日後から予約できるか",
+      "min": 0,
+      "max": 14,
+      "step": 1,
+      "unit": "日",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "pickup_max_days",
+      "label": "何日先まで予約できるか",
+      "min": 7,
+      "max": 90,
+      "step": 1,
+      "unit": "日",
+      "default": 30
+    },
+    {
+      "type": "text",
+      "id": "pickup_closed_days",
+      "label": "定休日（曜日。複数ならカンマ区切り）",
+      "default": "火"
+    },
+    {
+      "type": "text",
+      "id": "pickup_time_slots",
+      "label": "受け取り時間（カンマ区切り）",
+      "default": "11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00"
+    },
+    {
+      "type": "text",
+      "id": "pickup_note",
+      "label": "説明文",
+      "default": "ケーキは3日後から予約できます。火曜日は定休日です。"
+    }
+  ]
+}

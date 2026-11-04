@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>01 表紙</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .left { position: absolute; left: 80px; top: 150px; width: 650px; }
+  h1 { font-size: 72px; margin: 30px 0 26px; }
+  ul { list-style: none; }
+  li { font-size: 32px; font-weight: 700; line-height: 1.4; padding: 14px 0 14px 64px; position: relative; }
+  li::before { content: ""; position: absolute; left: 0; top: 18px; width: 42px; height: 42px; border-radius: 50%; background: var(--accent); }
+  li::after { content: ""; position: absolute; left: 13px; top: 26px; width: 12px; height: 20px; border: solid #fff; border-width: 0 5px 5px 0; transform: rotate(45deg); }
+  .free { margin-top: 26px; background: #fff; border: 3px solid var(--accent); border-radius: 20px; padding: 16px 26px; font-size: 30px; font-weight: 700; line-height: 1.5; }
+  .free small { display: block; font-size: 22px; color: var(--sub); font-weight: 500; }
+  .phone { position: absolute; left: 770px; top: 230px; width: 380px; height: 716px; border-radius: 52px; background: var(--ink); padding: 16px; box-shadow: 0 20px 50px rgba(90, 50, 40, 0.28); }
+  .phone .shot { width: 348px; height: 684px; border-radius: 38px; border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <span class="chip">Shopify × ケーキ予約</span>
+    <h1>ケーキの予約を<br><em>ネットで24時間</em><br>受け付けます</h1>
+    <ul>
+      <li>サイズで値段が変わる商品ページ</li>
+      <li>メッセージプレート・ろうそくも入力</li>
+      <li>受け取り日と時間をお客さんが選ぶ</li>
+      <li>確認メールに受け取り日時を表示</li>
+    </ul>
+    <div class="free">
+      プログラムの知識がなくても運営できます
+      <small>商品・値段・定休日は管理画面から変えられます</small>
+    </div>
+  </div>
+  <div class="phone">
+    <div class="shot" style="--w:668px; --s:0.5719; --x:30px; --y:90px">
+      <img src="../../screens/shots/top.jpg" alt="">
+    </div>
+  </div>
+  <p class="note">※画面は架空のサンプル店「パティスリー こむぎ」で作ったものです</p>
+</body>
+</html>
