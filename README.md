@@ -57,11 +57,11 @@ Horizon テーマ本体は、Shopify の利用条件によりこのリポジト�
 
 ### 5. LINE×AI 自動応答 ― ヘアサロン ことり
 
-[![LINE×AI 自動応答の使う前と後](samples/05-line-ai/listing/02-before-after.png)](samples/05-line-ai/)
+[![LINE×AI 自動応答の表紙](samples/05-line-ai/listing/01-cover.png)](samples/05-line-ai/)
 
 LINE 公式アカウントに届いた質問に、AI（Claude）が自動でお返事します。答えの根拠は、お店がスプレッドシートに書いた「よくある質問」だけです。値引き・体のこと・予約の空き・クレーム・シートに無い質問には AI が答えず、スタッフへ引きついでお店にメールで知らせます。会話はすべてシートに残り、使いすぎを防ぐ回数の上限もあります。
 
-LINE の画面は説明用の図で示しています。
+表紙の LINE の画面は、架空のお店の LINE 公式アカウントで実際に動かしたものです。
 
 → [05-line-ai](samples/05-line-ai/)
 
