@@ -126,4 +126,4 @@ node --test tests/*.test.js
 
 - クラウドワークス：https://crowdworks.jp/public/employees/5863922
 - ランサーズ：https://www.lancers.jp/profile/yoshi5832
-- ココナラ：準備中です
+- ココナラ：https://coconala.com/users/6394172
