@@ -125,4 +125,5 @@ node --test tests/*.test.js
 この見本をもとにした仕組みづくりのご依頼・ご相談は、次のプロフィールからお願いします。
 
 - クラウドワークス：https://crowdworks.jp/public/employees/5863922
-- ココナラ・ランサーズ：準備中です
+- ランサーズ：https://www.lancers.jp/profile/yoshi5832
+- ココナラ：準備中です
