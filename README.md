@@ -122,8 +122,4 @@ node --test tests/*.test.js
 
 ## ご依頼・ご相談
 
-この見本をもとにした仕組みづくりのご依頼・ご相談は、次のプロフィールからお願いします。
-
-- クラウドワークス：https://crowdworks.jp/public/employees/5863922
-- ランサーズ：https://www.lancers.jp/profile/yoshi5832
-- ココナラ：https://coconala.com/users/6394172
+この見本をもとにした仕組みづくりのご相談は、この見本集をご覧になったサービスの中で、メッセージ機能からお気軽にお送りください。
